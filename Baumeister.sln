@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Baumeister.Examples", "Baum
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Baumeister.Abstractions", "Baumeister.Abstractions\Baumeister.Abstractions.csproj", "{AFD324B6-54E2-4AE7-AE6D-58AED1CBE40E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Baumeister.Examples.UnitTests", "Baumeister.Examples.UnitTests\Baumeister.Examples.UnitTests.csproj", "{91F46D6F-7E3F-43EF-B9A9-84D45E03DE7D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{AFD324B6-54E2-4AE7-AE6D-58AED1CBE40E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFD324B6-54E2-4AE7-AE6D-58AED1CBE40E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AFD324B6-54E2-4AE7-AE6D-58AED1CBE40E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91F46D6F-7E3F-43EF-B9A9-84D45E03DE7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91F46D6F-7E3F-43EF-B9A9-84D45E03DE7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91F46D6F-7E3F-43EF-B9A9-84D45E03DE7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91F46D6F-7E3F-43EF-B9A9-84D45E03DE7D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
