@@ -3,12 +3,29 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Baumeister.Examples", "Baumeister.Examples\Baumeister.Examples.csproj", "{DE059FB2-A658-4AFB-892C-A08F941415B0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Baumeister.Abstractions", "Baumeister.Abstractions\Baumeister.Abstractions.csproj", "{AFD324B6-54E2-4AE7-AE6D-58AED1CBE40E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DE059FB2-A658-4AFB-892C-A08F941415B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE059FB2-A658-4AFB-892C-A08F941415B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE059FB2-A658-4AFB-892C-A08F941415B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE059FB2-A658-4AFB-892C-A08F941415B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFD324B6-54E2-4AE7-AE6D-58AED1CBE40E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFD324B6-54E2-4AE7-AE6D-58AED1CBE40E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFD324B6-54E2-4AE7-AE6D-58AED1CBE40E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFD324B6-54E2-4AE7-AE6D-58AED1CBE40E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B8ECF7E6-216B-4EDC-90DC-E348A839B364}
 	EndGlobalSection
 EndGlobal
