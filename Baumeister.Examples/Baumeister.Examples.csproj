@@ -1,13 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>.\GeneratedFiles</CompilerGeneratedFilesOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Baumeister.Abstractions\Baumeister.Abstractions.csproj" />
+    <ProjectReference Include="..\Baumeister.Generators\Baumeister.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="GeneratedFiles\Baumeister.Generators\" />
+    <Folder Include="GeneratedFiles\Baumeister.Generators\Baumeister.Generators.Building.BuilderSourceGenerator\" />
   </ItemGroup>
 
 </Project>

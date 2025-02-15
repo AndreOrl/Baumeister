@@ -13,9 +13,12 @@ namespace Baumeister.Examples.UnitTests.ExampleAggregate
                 .WithZipCode(new ZipCode("12345"))
                 .Build();
 
-            Assert.That(address.Street.Value, Is.EqualTo("Main Street"));
-            Assert.That(address.City.Value, Is.EqualTo("Springfield"));
-            Assert.That(address.ZipCode.Value, Is.EqualTo("12345"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(address.Street.Value, Is.EqualTo("Main Street"));
+                Assert.That(address.City.Value, Is.EqualTo("Springfield"));
+                Assert.That(address.ZipCode.Value, Is.EqualTo("12345"));
+            });
         }
 
         [Test]
@@ -27,9 +30,12 @@ namespace Baumeister.Examples.UnitTests.ExampleAggregate
                 .With(new ZipCode("12345"))
                 .Build();
 
-            Assert.That(address.Street.Value, Is.EqualTo("Main Street"));
-            Assert.That(address.City.Value, Is.EqualTo("Springfield"));
-            Assert.That(address.ZipCode.Value, Is.EqualTo("12345"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(address.Street.Value, Is.EqualTo("Main Street"));
+                Assert.That(address.City.Value, Is.EqualTo("Springfield"));
+                Assert.That(address.ZipCode.Value, Is.EqualTo("12345"));
+            });
         }
 
         [Test]
@@ -40,8 +46,11 @@ namespace Baumeister.Examples.UnitTests.ExampleAggregate
                 .With(new City("Springfield"))
                 .Build();
 
-            Assert.That(address.Street.Value, Is.EqualTo("Main Street"));
-            Assert.That(address.City.Value, Is.EqualTo("Springfield"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(address.Street.Value, Is.EqualTo("Main Street"));
+                Assert.That(address.City.Value, Is.EqualTo("Springfield"));
+            });
         }
     }
 }

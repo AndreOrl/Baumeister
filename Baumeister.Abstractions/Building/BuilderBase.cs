@@ -11,7 +11,7 @@ namespace Baumeister.Abstractions.Building
             return new TBuilder();
         }
 
-        private List<object> valueStore = new List<object>();
+        private readonly List<object> valueStore = [];
 
         public BuilderBase<TBuilder, TEntity> With<T>(T value)
         {
@@ -26,7 +26,6 @@ namespace Baumeister.Abstractions.Building
         public TEntity Build()
         {
             var constructor = FindMatchingConstructor();
-            var parameters = constructor.GetParameters();
 
             return InvokeConstructor(constructor, valueStore);
         }
@@ -34,14 +33,14 @@ namespace Baumeister.Abstractions.Building
         private ConstructorInfo FindMatchingConstructor()
         {
             ConstructorInfo[] constructors = typeof(TEntity).GetConstructors();
-            Type[] valueTypes = valueStore.Select(v => v.GetType()).ToArray();
+            Type[] valueTypes = [.. valueStore.Select(v => v.GetType())];
 
 
-            ConstructorInfo foundConstructor = null;
+            ConstructorInfo? foundConstructor = null;
             var constructorFound = TryFindExactMatchingConstructor(constructors, valueTypes, ref foundConstructor);
             constructorFound = constructorFound || TryFindImplicitMatchingConstructor(constructors, valueTypes, ref foundConstructor);
 
-            return constructorFound ? foundConstructor : throw new InvalidOperationException("No constructor found");
+            return constructorFound ? foundConstructor! : throw new InvalidOperationException("No constructor found");
         }      
 
         private bool TryFindExactMatchingConstructor(ConstructorInfo[] constructors, Type[] valueTypes, ref ConstructorInfo? foundConstructor)
@@ -62,7 +61,7 @@ namespace Baumeister.Abstractions.Building
 
         private bool TryFindImplicitMatchingConstructor(ConstructorInfo[] constructors, Type[] valueTypes, ref ConstructorInfo? foundConstructor)
         {
-            ConstructorInfo bestMatch = null;
+            ConstructorInfo? bestMatch = null;
             int maxMatches = -1;
 
             foreach (var constructor in constructors)
@@ -89,7 +88,7 @@ namespace Baumeister.Abstractions.Building
         private TEntity InvokeConstructor(ConstructorInfo constructor, List<object> values)
         {
             var parameters = constructor.GetParameters();
-            var orderedValues = new object[parameters.Length];
+            var orderedValues = new object?[parameters.Length];
 
             for (int i = 0; i < parameters.Length; i++)
             {
@@ -109,7 +108,7 @@ namespace Baumeister.Abstractions.Building
             return (TEntity)constructor.Invoke(orderedValues);
         }
 
-        private object GetDefaultValue(Type type)
+        private object? GetDefaultValue(Type type)
         {
             return type.IsValueType ? Activator.CreateInstance(type) : null;
         }

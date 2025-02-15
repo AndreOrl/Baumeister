@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Profil \"1\"": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "..\\Baumeister.Examples\\Baumeister.Examples.csproj"
+    }
+  }
+}
