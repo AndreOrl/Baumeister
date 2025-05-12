@@ -20,10 +20,13 @@ namespace Baumeister.Abstractions.Building
         public TEntity Build()
         {
             var constructor = FindMatchingConstructor();
+                        
+            var createdObject = InvokeConstructor(constructor, valueStore, out var remainingValues);
+            SetRemainingProperties(createdObject, remainingValues);
 
-            return InvokeConstructor(constructor, valueStore);
+            return createdObject;
         }
-
+        
         private ConstructorInfo FindMatchingConstructor()
         {
             ConstructorInfo[] constructors = typeof(TEntity).GetConstructors();
@@ -79,11 +82,12 @@ namespace Baumeister.Abstractions.Building
             return false;
         }
 
-        private TEntity InvokeConstructor(ConstructorInfo constructor, List<object> values)
+        private TEntity InvokeConstructor(ConstructorInfo constructor, List<object> values, out List<object> remainingValues)
         {
+            remainingValues = [.. values];
             var parameters = constructor.GetParameters();
             var orderedValues = new object?[parameters.Length];
-
+            
             for (int i = 0; i < parameters.Length; i++)
             {
                 var parameterType = parameters[i].ParameterType;
@@ -92,6 +96,7 @@ namespace Baumeister.Abstractions.Building
                 if (matchingValue != null)
                 {
                     orderedValues[i] = matchingValue;
+                    remainingValues.Remove(matchingValue);
                 }
                 else
                 {
@@ -105,6 +110,20 @@ namespace Baumeister.Abstractions.Building
         private object? GetDefaultValue(Type type)
         {
             return type.IsValueType ? Activator.CreateInstance(type) : null;
+        }
+
+        private void SetRemainingProperties(TEntity createdObject, List<object> values)
+        {
+            var createdObjectsType = createdObject.GetType();
+            createdObjectsType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(p => p.CanWrite && values.Any(v => v.GetType() == p.PropertyType))
+                .ToList()
+                .ForEach(p =>
+                {
+                    var matchingValue = values.First(v => v.GetType() == p.PropertyType);
+                    p.SetValue(createdObject, matchingValue);
+                    values.Remove(matchingValue);
+                });
         }
     }
 }

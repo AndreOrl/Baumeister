@@ -2,7 +2,5 @@
 
 namespace Baumeister.Examples.AddressAggregate
 {
-    public partial class AddressBuilder : BuilderBase<Address>
-    {
-    }
+    public partial class AddressBuilder : BuilderBase<Address>;
 }

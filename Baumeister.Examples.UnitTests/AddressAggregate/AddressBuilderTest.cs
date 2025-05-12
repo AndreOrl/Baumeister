@@ -2,7 +2,7 @@
 
 namespace Baumeister.Examples.UnitTests.AddressAggregate
 {
-    public class AddressBuilderTest
+    public class PersonBuilderTest
     {
         [Test]
         public void ExplicitWithMethods_WithAllPropertiesSet_ShouldBuildCorrectly()
