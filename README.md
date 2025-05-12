@@ -2,19 +2,10 @@
 Baumeister (german for "master builder") is a simple tool that helps you by generating builder-pattern classes for your objects.
 
 ## Usage
-To generate a builder class for a class `House` you first have to add a class `HouseBuilder`. 
-In order to make it findable for Baumeister, you have to attribute it with the `BuilderAttribute`.
-To specify that the builder should generate code for building the `House` class, you have to specify the `BuilderAttribute` with the `House` class as parameter.
+To generate a builder class for a class `House` you first have to add a partial class `HouseBuilder`. 
+In order to make it findable for Baumeister, you have to make it a generic specialization of `BuilderBase<T>`.
 ```cs
-[Builder(typeof(House))]
-public class HouseBuilder
-{
-}
-```
-The next step is to implement the `BuilderBase` class with the type of the builder class itself, and the type of the object to be built, as parameters.
-```cs
-[Builder(typeof(House))]
-public class HouseBuilder : BuilderBase<HouseBuilder, House>
+public partial class HouseBuilder : BuilderBase<House>
 {
 }
 ```
@@ -40,8 +31,7 @@ public class House
 	}
 }
 
-[Builder(typeof(House))]
-public class HouseBuilder : BuilderBase<HouseBuilder, House>
+public partial class HouseBuilder : BuilderBase<House>
 {
 }
 
@@ -59,5 +49,7 @@ class Program
 ```
 ## How it works
 Baumeister uses the Roslyn compiler to analyze the source code of the project.
-It searches for classes that are attributed with the `BuilderAttribute` and generates extensions methods for that class that enables the builder pattern.
+It searches for classes that are specializations of `BuilderBase` and generates a partial class with methods that enables the builder pattern.
 The `Build()` method instantiates the object with the specified properties and returns it. For the instantiation, the builder uses the constructor with the most matching parameters.
+It matches the given parameters with the constructor parameters and tries to find the best match. In order to do that it uses the type and names of the properties. 
+In case not all properties that are set are used by the constructor, the builder will use public properties to set the values.
