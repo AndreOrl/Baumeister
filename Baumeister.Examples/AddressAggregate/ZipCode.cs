@@ -1,4 +1,4 @@
-﻿namespace Baumeister.Examples.ExampleAggregate
+﻿namespace Baumeister.Examples.AddressAggregate
 {
     public struct ZipCode
     {

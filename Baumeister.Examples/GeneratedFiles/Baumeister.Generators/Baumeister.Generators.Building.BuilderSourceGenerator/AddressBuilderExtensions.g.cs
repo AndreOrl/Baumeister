@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Baumeister.Examples.ExampleAggregate
+namespace Baumeister.Examples.AddressAggregate
 {
     public partial class AddressBuilder
     {
@@ -15,19 +15,19 @@ namespace Baumeister.Examples.ExampleAggregate
             return this;
         }
 
-        public AddressBuilder WithStreet(Baumeister.Examples.ExampleAggregate.Street street)
+        public AddressBuilder WithStreet(Baumeister.Examples.AddressAggregate.Street street)
         {
             this.With(street);
             return this;
         }
 
-        public AddressBuilder WithCity(Baumeister.Examples.ExampleAggregate.City city)
+        public AddressBuilder WithCity(Baumeister.Examples.AddressAggregate.City city)
         {
             this.With(city);
             return this;
         }
 
-        public AddressBuilder WithZipCode(Baumeister.Examples.ExampleAggregate.ZipCode zipcode)
+        public AddressBuilder WithZipCode(Baumeister.Examples.AddressAggregate.ZipCode zipcode)
         {
             this.With(zipcode);
             return this;

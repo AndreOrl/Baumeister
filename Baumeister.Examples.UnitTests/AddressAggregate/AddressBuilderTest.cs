@@ -1,11 +1,11 @@
-﻿using Baumeister.Examples.ExampleAggregate;
+﻿using Baumeister.Examples.AddressAggregate;
 
-namespace Baumeister.Examples.UnitTests.ExampleAggregate
+namespace Baumeister.Examples.UnitTests.AddressAggregate
 {
     public class AddressBuilderTest
     {
         [Test]
-        public void ExplicitMethods_ShouldBuildCorrectly()
+        public void ExplicitWithMethods_WithAllPropertiesSet_ShouldBuildCorrectly()
         {
             var address = AddressBuilder.New()
                 .WithStreet(new Street("Main Street"))
@@ -22,7 +22,7 @@ namespace Baumeister.Examples.UnitTests.ExampleAggregate
         }
 
         [Test]
-        public void GenericMethods_WithAllPropertiesSet_ShouldBuildCorrectly()
+        public void GenericWithMethods_WithAllPropertiesSet_ShouldBuildCorrectly()
         {
             var address = AddressBuilder.New()
                 .With(new City("Springfield"))
@@ -39,7 +39,22 @@ namespace Baumeister.Examples.UnitTests.ExampleAggregate
         }
 
         [Test]
-        public void GenericMethods_WithMissingProperties_ShouldBuildCorrectly()
+        public void ExplicitWithMethods_WithMissingProperties_ShouldBuildCorrectly()
+        {
+            var address = AddressBuilder.New()
+                .WithStreet(new Street("Main Street"))
+                .WithCity(new City("Springfield"))
+                .Build();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(address.Street.Value, Is.EqualTo("Main Street"));
+                Assert.That(address.City.Value, Is.EqualTo("Springfield"));
+            });
+        }
+
+        [Test]
+        public void GenericWithMethods_WithMissingProperties_ShouldBuildCorrectly()
         {
             var address = AddressBuilder.New()
                 .With(new Street("Main Street"))

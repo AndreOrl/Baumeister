@@ -31,10 +31,10 @@ namespace Baumeister.Abstractions.Building
 
 
             ConstructorInfo? foundConstructor = null;
-            var constructorFound = TryFindExactMatchingConstructor(constructors, valueTypes, ref foundConstructor);
-            constructorFound = constructorFound || TryFindImplicitMatchingConstructor(constructors, valueTypes, ref foundConstructor);
+            var isCtorFound = TryFindExactMatchingConstructor(constructors, valueTypes, ref foundConstructor);
+            isCtorFound = isCtorFound || TryFindImplicitMatchingConstructor(constructors, valueTypes, ref foundConstructor);
 
-            return constructorFound ? foundConstructor! : throw new InvalidOperationException("No constructor found");
+            return isCtorFound ? foundConstructor! : throw new InvalidOperationException("No constructor found");
         }      
 
         private bool TryFindExactMatchingConstructor(ConstructorInfo[] constructors, Type[] valueTypes, ref ConstructorInfo? foundConstructor)
