@@ -48,8 +48,10 @@ namespace Baumeister.Generators.Building
                 sourceBuilder.AppendLine("");
                 sourceBuilder.AppendLine($"namespace {namespaceName}");
                 sourceBuilder.AppendLine("{");
-                sourceBuilder.AppendLine($"    public static class {className}Extensions");
+                sourceBuilder.AppendLine($"    public partial class {className}");
                 sourceBuilder.AppendLine("    {");
+
+                AddNewMethod(className, sourceBuilder);
 
                 var builderAttribute = candidate.AttributeLists
                     .SelectMany(attrList => attrList.Attributes)
@@ -83,13 +85,21 @@ namespace Baumeister.Generators.Building
             }
         }
 
+        private void AddNewMethod(string builderTypeName, StringBuilder stringBuilder)
+        {
+            stringBuilder.AppendLine($"        public static {builderTypeName} New()");
+            stringBuilder.AppendLine("        {");
+            stringBuilder.AppendLine($"            return new {builderTypeName}();");
+            stringBuilder.AppendLine("        }");
+        }
+
         private void AddWithMethodFor(ITypeSymbol propertyType, string propertyName, string builderTypeName, StringBuilder stringBuilder)
         {
             stringBuilder.AppendLine("");
-            stringBuilder.AppendLine($"        public static {builderTypeName} With{propertyName}(this {builderTypeName} builder, {propertyType} {propertyName.ToLower()})");
+            stringBuilder.AppendLine($"        public {builderTypeName} With{propertyName}({propertyType} {propertyName.ToLower()})");
             stringBuilder.AppendLine("        {");
-            stringBuilder.AppendLine($"            builder.With({propertyName.ToLower()});");
-            stringBuilder.AppendLine("            return builder;");
+            stringBuilder.AppendLine($"            this.With({propertyName.ToLower()});");
+            stringBuilder.AppendLine("            return this;");
             stringBuilder.AppendLine("        }");
         }
     }

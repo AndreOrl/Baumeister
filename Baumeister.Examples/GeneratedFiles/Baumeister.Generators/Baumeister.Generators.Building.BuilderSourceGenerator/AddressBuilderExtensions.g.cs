@@ -2,31 +2,35 @@
 
 namespace Baumeister.Examples.ExampleAggregate
 {
-    public static class AddressBuilderExtensions
+    public partial class AddressBuilder
     {
-
-        public static AddressBuilder WithEqualityContract(this AddressBuilder builder, System.Type equalitycontract)
+        public static AddressBuilder New()
         {
-            builder.With(equalitycontract);
-            return builder;
+            return new AddressBuilder();
         }
 
-        public static AddressBuilder WithStreet(this AddressBuilder builder, Baumeister.Examples.ExampleAggregate.Street street)
+        public AddressBuilder WithEqualityContract(System.Type equalitycontract)
         {
-            builder.With(street);
-            return builder;
+            this.With(equalitycontract);
+            return this;
         }
 
-        public static AddressBuilder WithCity(this AddressBuilder builder, Baumeister.Examples.ExampleAggregate.City city)
+        public AddressBuilder WithStreet(Baumeister.Examples.ExampleAggregate.Street street)
         {
-            builder.With(city);
-            return builder;
+            this.With(street);
+            return this;
         }
 
-        public static AddressBuilder WithZipCode(this AddressBuilder builder, Baumeister.Examples.ExampleAggregate.ZipCode zipcode)
+        public AddressBuilder WithCity(Baumeister.Examples.ExampleAggregate.City city)
         {
-            builder.With(zipcode);
-            return builder;
+            this.With(city);
+            return this;
+        }
+
+        public AddressBuilder WithZipCode(Baumeister.Examples.ExampleAggregate.ZipCode zipcode)
+        {
+            this.With(zipcode);
+            return this;
         }
     }
 }

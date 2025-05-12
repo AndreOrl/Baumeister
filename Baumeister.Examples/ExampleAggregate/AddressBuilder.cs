@@ -3,7 +3,7 @@
 namespace Baumeister.Examples.ExampleAggregate
 {
     [Builder(typeof(Address))]
-    public class AddressBuilder : BuilderBase<AddressBuilder, Address>
+    public partial class AddressBuilder : BuilderBase<Address>
     {
     }
 }

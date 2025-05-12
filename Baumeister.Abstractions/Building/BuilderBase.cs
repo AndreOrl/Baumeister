@@ -2,18 +2,12 @@
 
 namespace Baumeister.Abstractions.Building
 {
-    public abstract class BuilderBase<TBuilder, TEntity>
-        where TBuilder : BuilderBase<TBuilder, TEntity>, new()
+    public abstract class BuilderBase<TEntity>
         where TEntity : class
     {
-        public static TBuilder New()
-        {
-            return new TBuilder();
-        }
-
         private readonly List<object> valueStore = [];
 
-        public BuilderBase<TBuilder, TEntity> With<T>(T value)
+        public BuilderBase<TEntity> With<T>(T value)
         {
             if(value != null)
             {
