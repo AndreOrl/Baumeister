@@ -12,31 +12,33 @@ namespace Baumeister.Generators.Building
     {
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
-            var classDeclarations = context.SyntaxProvider.ForAttributeWithMetadataName(
-                "Baumeister.Abstractions.Building.BuilderAttribute",
-                predicate: static (_, _) => true,
-                transform: static (ctx, _) => GetClassDeclaration(ctx))
-                .Collect()
-                .SelectMany((m, _) => m.Distinct());
+            var classDeclarations = context.SyntaxProvider
+                .CreateSyntaxProvider(
+                    predicate: static (s, _) => IsDerivedFromBuilderBase(s),
+                    transform: static (ctx, _) => GetClassDeclaration(ctx))
+                .Where(static m => m is not null);
 
             var compilationAndClasses = context.CompilationProvider.Combine(classDeclarations.Collect());
 
             context.RegisterSourceOutput(compilationAndClasses, (spc, source) => Execute(source.Left, source.Right!, spc));
         }
 
-        private static ClassDeclarationSyntax GetClassDeclaration(GeneratorAttributeSyntaxContext context)
+        private static bool IsDerivedFromBuilderBase(SyntaxNode node)
         {
-            var classDeclaration = (ClassDeclarationSyntax)context.TargetNode;
+            return node is ClassDeclarationSyntax classDeclaration &&
+                   classDeclaration.BaseList?.Types.Any(baseType =>
+                       baseType.Type is GenericNameSyntax genericName &&
+                       genericName.Identifier.Text == "BuilderBase") == true;
+        }
+
+        private static ClassDeclarationSyntax? GetClassDeclaration(GeneratorSyntaxContext context)
+        {
+            var classDeclaration = (ClassDeclarationSyntax)context.Node;
             return classDeclaration;
         }
 
         private void Execute(Compilation compilation, ImmutableArray<ClassDeclarationSyntax> classes, SourceProductionContext context)
         {
-            if (compilation.AssemblyName?.EndsWith(".Tests") == true)
-            {
-                return;
-            }
-
             foreach (var candidate in classes)
             {
                 var className = candidate.Identifier.ValueText;
@@ -53,27 +55,20 @@ namespace Baumeister.Generators.Building
 
                 AddNewMethod(className, sourceBuilder);
 
-                var builderAttribute = candidate.AttributeLists
-                    .SelectMany(attrList => attrList.Attributes)
-                    .FirstOrDefault(attr => (attr.Name as IdentifierNameSyntax)?.Identifier.Text == "Builder");
+                var semanticModel = compilation.GetSemanticModel(candidate.SyntaxTree);
+                var baseType = candidate.BaseList?.Types
+                    .Select(baseType => semanticModel.GetTypeInfo(baseType.Type).Type)
+                    .OfType<INamedTypeSymbol>()
+                    .FirstOrDefault(type => type.Name == "BuilderBase");
 
-                if (builderAttribute != null)
+                if (baseType != null && baseType.TypeArguments.Length == 1)
                 {
-                    var semanticModel = compilation.GetSemanticModel(builderAttribute.SyntaxTree);
-                    var attributeSymbol = semanticModel.GetSymbolInfo(builderAttribute).Symbol as IMethodSymbol;
-                    if (attributeSymbol != null && attributeSymbol.ContainingType.ToDisplayString() == "Baumeister.Abstractions.Building.BuilderAttribute")
+                    var typeToBuild = baseType.TypeArguments[0] as INamedTypeSymbol;
+                    if (typeToBuild != null)
                     {
-                        var typeOfExpression = builderAttribute.ArgumentList?.Arguments.FirstOrDefault()?.Expression as TypeOfExpressionSyntax;
-                        if (typeOfExpression != null)
+                        foreach (var property in typeToBuild.GetMembers().OfType<IPropertySymbol>())
                         {
-                            var typeToBuild = semanticModel.GetTypeInfo(typeOfExpression.Type).Type as INamedTypeSymbol;
-                            if (typeToBuild != null)
-                            {
-                                foreach (var property in typeToBuild.GetMembers().OfType<IPropertySymbol>())
-                                {
-                                    AddWithMethodFor(property.Type, property.Name, className, sourceBuilder);
-                                }
-                            }
+                            AddWithMethodFor(property.Type, property.Name, className, sourceBuilder);
                         }
                     }
                 }
