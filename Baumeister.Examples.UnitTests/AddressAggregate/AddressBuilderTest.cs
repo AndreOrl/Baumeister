@@ -25,9 +25,9 @@ namespace Baumeister.Examples.UnitTests.AddressAggregate
         public void GenericWithMethods_WithAllPropertiesSet_ShouldBuildCorrectly()
         {
             var address = AddressBuilder.New()
-                .With(new City("Springfield"))
-                .With(new Street("Main Street"))
-                .With(new ZipCode("12345"))
+                .With("City", new City("Springfield"))
+                .With("Street", new Street("Main Street"))
+                .With("ZipCode", new ZipCode("12345"))
                 .Build();
 
             Assert.Multiple(() =>
@@ -57,8 +57,8 @@ namespace Baumeister.Examples.UnitTests.AddressAggregate
         public void GenericWithMethods_WithMissingProperties_ShouldBuildCorrectly()
         {
             var address = AddressBuilder.New()
-                .With(new Street("Main Street"))
-                .With(new City("Springfield"))
+                .With("Street", new Street("Main Street"))
+                .With("City", new City("Springfield"))
                 .Build();
 
             Assert.Multiple(() =>

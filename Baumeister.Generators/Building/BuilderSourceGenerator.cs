@@ -63,8 +63,7 @@ namespace Baumeister.Generators.Building
 
                 if (baseType != null && baseType.TypeArguments.Length == 1)
                 {
-                    var typeToBuild = baseType.TypeArguments[0] as INamedTypeSymbol;
-                    if (typeToBuild != null)
+                    if (baseType.TypeArguments[0] is INamedTypeSymbol typeToBuild)
                     {
                         foreach (var property in typeToBuild.GetMembers().OfType<IPropertySymbol>())
                         {
@@ -93,7 +92,7 @@ namespace Baumeister.Generators.Building
             stringBuilder.AppendLine("");
             stringBuilder.AppendLine($"        public {builderTypeName} With{propertyName}({propertyType} {propertyName.ToLower()})");
             stringBuilder.AppendLine("        {");
-            stringBuilder.AppendLine($"            this.With({propertyName.ToLower()});");
+            stringBuilder.AppendLine($"            this.With(\"{propertyName}\", {propertyName.ToLower()});");
             stringBuilder.AppendLine("            return this;");
             stringBuilder.AppendLine("        }");
         }

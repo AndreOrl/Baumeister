@@ -11,25 +11,25 @@ namespace Baumeister.Examples.AddressAggregate
 
         public AddressBuilder WithEqualityContract(System.Type equalitycontract)
         {
-            this.With(equalitycontract);
+            this.With("EqualityContract", equalitycontract);
             return this;
         }
 
         public AddressBuilder WithStreet(Baumeister.Examples.AddressAggregate.Street street)
         {
-            this.With(street);
+            this.With("Street", street);
             return this;
         }
 
         public AddressBuilder WithCity(Baumeister.Examples.AddressAggregate.City city)
         {
-            this.With(city);
+            this.With("City", city);
             return this;
         }
 
         public AddressBuilder WithZipCode(Baumeister.Examples.AddressAggregate.ZipCode zipcode)
         {
-            this.With(zipcode);
+            this.With("ZipCode", zipcode);
             return this;
         }
     }

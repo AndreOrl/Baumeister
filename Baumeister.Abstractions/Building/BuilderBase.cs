@@ -5,13 +5,13 @@ namespace Baumeister.Abstractions.Building
     public abstract class BuilderBase<TEntity>
         where TEntity : class
     {
-        private readonly List<object> valueStore = [];
+        private readonly List<ValueMapping> valueStore = [];
 
-        public BuilderBase<TEntity> With<T>(T value)
+        public BuilderBase<TEntity> With<T>(string name, T value)
         {
             if(value != null)
             {
-                valueStore.Add(value);
+                valueStore.Add(new ValueMapping(name, value));
             }
 
             return this;
@@ -22,7 +22,7 @@ namespace Baumeister.Abstractions.Building
             var constructor = FindMatchingConstructor();
                         
             var createdObject = InvokeConstructor(constructor, valueStore, out var remainingValues);
-            SetRemainingProperties(createdObject, remainingValues);
+            SetRemainingProperties(constructor, createdObject, remainingValues);
 
             return createdObject;
         }
@@ -30,7 +30,7 @@ namespace Baumeister.Abstractions.Building
         private ConstructorInfo FindMatchingConstructor()
         {
             ConstructorInfo[] constructors = typeof(TEntity).GetConstructors();
-            Type[] valueTypes = [.. valueStore.Select(v => v.GetType())];
+            Type[] valueTypes = [.. valueStore.Select(v => v.Value.GetType())];
 
 
             ConstructorInfo? foundConstructor = null;
@@ -82,7 +82,7 @@ namespace Baumeister.Abstractions.Building
             return false;
         }
 
-        private TEntity InvokeConstructor(ConstructorInfo constructor, List<object> values, out List<object> remainingValues)
+        private TEntity InvokeConstructor(ConstructorInfo constructor, List<ValueMapping> values, out List<ValueMapping> remainingValues)
         {
             remainingValues = [.. values];
             var parameters = constructor.GetParameters();
@@ -91,12 +91,21 @@ namespace Baumeister.Abstractions.Building
             for (int i = 0; i < parameters.Length; i++)
             {
                 var parameterType = parameters[i].ParameterType;
-                var matchingValue = values.FirstOrDefault(v => v.GetType() == parameterType);
+                var valuesMatchedByType = values.Where(v => v.Value.GetType() == parameterType).ToList();
 
-                if (matchingValue != null)
+                if (valuesMatchedByType.Count == 1)
                 {
-                    orderedValues[i] = matchingValue;
-                    remainingValues.Remove(matchingValue);
+                    orderedValues[i] = valuesMatchedByType[0].Value;
+                    remainingValues.Remove(valuesMatchedByType[0]);
+                }
+                else if(valuesMatchedByType.Count > 1)
+                {
+                    var valuesMatchedByTypeAndName = valuesMatchedByType.Where(v => parameters[i].Name == v.Name).ToList();
+                    if (valuesMatchedByTypeAndName.Count == 1)
+                    {
+                        orderedValues[i] = valuesMatchedByTypeAndName[0].Value;
+                        remainingValues.Remove(valuesMatchedByTypeAndName[0]);
+                    }
                 }
                 else
                 {
@@ -112,17 +121,34 @@ namespace Baumeister.Abstractions.Building
             return type.IsValueType ? Activator.CreateInstance(type) : null;
         }
 
-        private void SetRemainingProperties(TEntity createdObject, List<object> values)
+        private void SetRemainingProperties(ConstructorInfo usedConstructor, TEntity createdObject, List<ValueMapping> values)
         {
+            var initializedConstructorParameters = usedConstructor.GetParameters().Select(p => p.Name.ToLowerInvariant());
+
             var createdObjectsType = createdObject.GetType();
             createdObjectsType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .Where(p => p.CanWrite && values.Any(v => v.GetType() == p.PropertyType))
+                .Where(p => 
+                    p.CanWrite && 
+                    initializedConstructorParameters.Contains(p.Name.ToLowerInvariant()) == false &&
+                    values.Any(v => v.Value.GetType() == p.PropertyType))
                 .ToList()
                 .ForEach(p =>
                 {
-                    var matchingValue = values.First(v => v.GetType() == p.PropertyType);
-                    p.SetValue(createdObject, matchingValue);
-                    values.Remove(matchingValue);
+                    var valuesMatchedByType = values.Where(v => v.Value.GetType() == p.PropertyType).ToList();
+                    if(valuesMatchedByType.Count == 1)
+                    {
+                        p.SetValue(createdObject, valuesMatchedByType[0].Value);
+                        values.Remove(valuesMatchedByType[0]);
+                    }
+                    if(valuesMatchedByType.Count > 1)
+                    {
+                        var valuesMatchedByTypeAndName = valuesMatchedByType.Where(v => v.Name == p.Name).ToList();
+                        if(valuesMatchedByTypeAndName.Count == 1)
+                        {
+                            p.SetValue(createdObject, valuesMatchedByTypeAndName[0].Value);
+                            values.Remove(valuesMatchedByTypeAndName[0]);
+                        }
+                    }
                 });
         }
     }

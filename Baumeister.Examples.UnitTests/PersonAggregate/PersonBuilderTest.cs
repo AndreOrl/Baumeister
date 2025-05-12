@@ -2,7 +2,7 @@
 
 namespace Baumeister.Examples.UnitTests.PersonAggregate
 {
-    public class PersonBuilderTest
+    public class DirtyBuilderTest
     {
         [Test]
         public void ExplicitWithMethods_WithCtorParametersSet_ShouldBuildCorrectly()
