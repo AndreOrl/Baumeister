@@ -12,9 +12,6 @@
     <PackageProjectUrl></PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/AndreOrl/Baumeister</RepositoryUrl>
-    <Version>$(AssemblyVersion)</Version>
-    <AssemblyVersion>$(AssemblyVersion)</AssemblyVersion>
-    <FileVersion>$(AssemblyVersion)</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup>
