@@ -46,6 +46,7 @@ namespace Baumeister.Generators.Building
                 var namespaceName = namespaceDeclaration.Name.ToString();
 
                 var sourceBuilder = new StringBuilder();
+                sourceBuilder.AppendLine("#nullable enable");
                 sourceBuilder.AppendLine("using System;");
                 sourceBuilder.AppendLine("");
                 sourceBuilder.AppendLine($"namespace {namespaceName}");
@@ -74,6 +75,7 @@ namespace Baumeister.Generators.Building
 
                 sourceBuilder.AppendLine("    }");
                 sourceBuilder.AppendLine("}");
+                sourceBuilder.AppendLine("#nullable restore");
 
                 context.AddSource($"{className}Extensions.g.cs", SourceText.From(sourceBuilder.ToString(), Encoding.UTF8));
             }

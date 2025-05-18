@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 
 namespace Baumeister.Examples.PersonAggregate
 {
@@ -28,3 +29,4 @@ namespace Baumeister.Examples.PersonAggregate
         }
     }
 }
+#nullable restore

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 
 namespace Baumeister.Examples.DirtyAggregate
 {
@@ -40,3 +41,4 @@ namespace Baumeister.Examples.DirtyAggregate
         }
     }
 }
+#nullable restore

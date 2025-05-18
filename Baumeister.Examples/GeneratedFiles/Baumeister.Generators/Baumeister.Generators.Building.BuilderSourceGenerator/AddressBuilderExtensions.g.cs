@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 
 namespace Baumeister.Examples.AddressAggregate
 {
@@ -34,3 +35,4 @@ namespace Baumeister.Examples.AddressAggregate
         }
     }
 }
+#nullable restore
