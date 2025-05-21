@@ -5,6 +5,7 @@
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <IsRoslynComponent>true</IsRoslynComponent>
     <IncludeBuildOutput>false</IncludeBuildOutput>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>Baumeister.Generators</Title>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl></PackageProjectUrl>
@@ -12,11 +13,13 @@
     <RepositoryUrl>https://github.com/AndreOrl/Baumeister</RepositoryUrl>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-  </PropertyGroup>
-
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+  
   <ItemGroup>
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
@@ -27,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Baumeister.Abstractions\Baumeister.Abstractions.csproj" OutputItemType="Analyzer" />
+    <ProjectReference Include="..\Baumeister.Abstractions\Baumeister.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>
