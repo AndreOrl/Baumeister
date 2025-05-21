@@ -1,5 +1,5 @@
 # Baumeister
-Baumeister (german for "master builder") is a simple tool that helps you by generating builder-pattern classes for your objects.
+Baumeister (german for "master builder") is a simple tool that helps by generating builder-pattern classes for your objects.
 
 ## Usage
 To generate a builder class for a class `House` you first have to add a partial class `HouseBuilder`. 
@@ -9,7 +9,7 @@ public partial class HouseBuilder : BuilderBase<House>
 {
 }
 ```
-After comiplation you are ready to use the newly generated builder.
+After compilation you are ready to use the newly generated builder.
 ## Examples
 
 ### Simple Example
