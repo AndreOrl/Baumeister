@@ -1,6 +1,6 @@
 ﻿namespace Baumeister.Abstractions.Building
 {
-    public record ValueMapping
+    public class ValueMapping
     {
         public string Name { get; }
                
