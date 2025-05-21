@@ -2,9 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <ImplicitUsings>false</ImplicitUsings>
+    <ImplicitUsings>enable</ImplicitUsings>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <LangVersion>8</LangVersion>
     <Title>Baumeister.Abstractions</Title>
   </PropertyGroup>
 

@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace Baumeister.Abstractions.Building
 {
     public abstract class BuilderBase<TEntity>
         where TEntity : class
     {
-        private readonly List<ValueMapping> valueStore = new List<ValueMapping>();
+        private readonly List<ValueMapping> valueStore = [];
 
         public BuilderBase<TEntity> With<T>(string name, T value)
         {
@@ -33,7 +30,7 @@ namespace Baumeister.Abstractions.Building
         private ConstructorInfo FindMatchingConstructor()
         {
             ConstructorInfo[] constructors = typeof(TEntity).GetConstructors();
-            Type[] valueTypes = valueStore.Select(v => v.Value.GetType()).ToArray();
+            Type[] valueTypes = [.. valueStore.Select(v => v.Value.GetType())];
 
 
             ConstructorInfo? foundConstructor = null;
@@ -87,9 +84,7 @@ namespace Baumeister.Abstractions.Building
 
         private TEntity InvokeConstructor(ConstructorInfo constructor, List<ValueMapping> values, out List<ValueMapping> remainingValues)
         {
-            remainingValues = new List<ValueMapping>();
-            remainingValues.AddRange(values);
-
+            remainingValues = [.. values];
             var parameters = constructor.GetParameters();
             var orderedValues = new object?[parameters.Length];
             
