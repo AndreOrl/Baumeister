@@ -5,7 +5,7 @@ namespace Baumeister.Abstractions.Building
     public abstract class BuilderBase<TEntity>
         where TEntity : class
     {
-        private readonly List<ValueMapping> valueStore = [];
+        private readonly List<ValueMapping> valueStore = new();
 
         public BuilderBase<TEntity> With<T>(string name, T value)
         {
@@ -30,7 +30,7 @@ namespace Baumeister.Abstractions.Building
         private ConstructorInfo FindMatchingConstructor()
         {
             ConstructorInfo[] constructors = typeof(TEntity).GetConstructors();
-            Type[] valueTypes = [.. valueStore.Select(v => v.Value.GetType())];
+            Type[] valueTypes = valueStore.Select(v => v.Value.GetType()).ToArray();
 
 
             ConstructorInfo? foundConstructor = null;
@@ -84,7 +84,9 @@ namespace Baumeister.Abstractions.Building
 
         private TEntity InvokeConstructor(ConstructorInfo constructor, List<ValueMapping> values, out List<ValueMapping> remainingValues)
         {
-            remainingValues = [.. values];
+            remainingValues = new List<ValueMapping>();
+            remainingValues.AddRange(values);
+
             var parameters = constructor.GetParameters();
             var orderedValues = new object?[parameters.Length];
             
