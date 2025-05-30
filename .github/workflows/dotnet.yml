@@ -51,6 +51,9 @@ jobs:
         git tag -a v${{ steps.gitversion.outputs.fullSemVer }} -m "Release v${{ steps.gitversion.outputs.fullSemVer }}"
         git push origin v${{ steps.gitversion.outputs.fullSemVer }}
 
+    - name: Debug GITHUB_TOKEN
+      run: echo "Token:${{ secrets.GITHUB_TOKEN }}"
+
     - name: Create GitHub Release
       uses: actions/create-release@v1
       with:
