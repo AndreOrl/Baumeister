@@ -51,12 +51,8 @@ jobs:
         git tag -a v${{ steps.gitversion.outputs.fullSemVer }} -m "Release v${{ steps.gitversion.outputs.fullSemVer }}"
         git push origin v${{ steps.gitversion.outputs.fullSemVer }}
 
-    - name: Debug GITHUB_TOKEN
-      run: echo "Token:${{ secrets.GITHUB_TOKEN }}"
-
     - name: Create release 
       uses: softprops/action-gh-release@v2
-      if: github.ref_type == 'tag'
       with:
         draft: true
         prerelease: true
