@@ -43,3 +43,10 @@ jobs:
       
     - name: Test
       run: dotnet test --no-build -c Release --verbosity normal
+
+    - name: Create Git Tag
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git tag -a v${{ steps.gitversion.outputs.fullSemVer }} -m "Release v${{ steps.gitversion.outputs.fullSemVer }}"
+        git push origin v${{ steps.gitversion.outputs.fullSemVer }}
