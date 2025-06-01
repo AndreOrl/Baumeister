@@ -40,9 +40,6 @@ jobs:
       
     - name: Build with version
       run: dotnet build --no-restore -c Release -p:Version=${{ steps.gitversion.outputs.fullSemVer }}
-
-    - name: List package files
-      run: ls -l ./nupkg
       
     - name: Test
       run: dotnet test --no-build -c Release --verbosity normal
@@ -62,5 +59,8 @@ jobs:
         draft: true
         prerelease: true
 
+    - name: Pack
+      run: dotnet pack --configuration Release --output ./nupkg
+
     - name: Publish Baumeister.Abstractions to nuget.org
-      run: dotnet nuget push "./bin/release/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source "https://api.nuget.org/v3/index.json"
+      run: dotnet nuget push "./nupkg/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source "https://api.nuget.org/v3/index.json"
