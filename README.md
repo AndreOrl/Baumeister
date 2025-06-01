@@ -1,8 +1,6 @@
 # Baumeister
 Baumeister (german for "master builder") is a simple tool that helps by generating builder-pattern classes for your objects.
 
-[![.NET](https://github.com/AndreOrl/Baumeister/actions/workflows/dotnet.yml/badge.svg)](https://github.com/AndreOrl/Baumeister/actions/workflows/dotnet.yml)
-
 ## Usage
 To generate a builder class for a class `House` you first have to add a partial class `HouseBuilder`. 
 In order to make it findable for Baumeister, you have to make it a generic specialization of `BuilderBase<T>`.
