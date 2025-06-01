@@ -1,5 +1,5 @@
 mode: ContinuousDeployment
 branches:
   main:
-    label: ''
+    label: Alpha
     increment: Patch
