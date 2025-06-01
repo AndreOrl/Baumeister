@@ -62,5 +62,5 @@ jobs:
     - name: Pack
       run: dotnet pack --configuration Release --output ./nupkg -p:Version=${{ steps.gitversion.outputs.fullSemVer }} --no-build
 
-    - name: Publish Baumeister.Abstractions to nuget.org
-      run: dotnet nuget push "./nupkg/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source "https://api.nuget.org/v3/index.json"
+    #- name: Publish Baumeister.Abstractions to nuget.org
+    #  run: dotnet nuget push "./nupkg/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source "https://api.nuget.org/v3/index.json"
