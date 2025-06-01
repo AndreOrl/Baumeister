@@ -40,6 +40,9 @@ jobs:
       
     - name: Build with version
       run: dotnet build --no-restore -c Release -p:Version=${{ steps.gitversion.outputs.fullSemVer }}
+
+    - name: List package files
+      run: ls -l ./nupkg
       
     - name: Test
       run: dotnet test --no-build -c Release --verbosity normal
