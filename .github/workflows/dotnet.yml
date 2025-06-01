@@ -32,10 +32,11 @@ jobs:
       id: gitversion
       uses: gittools/actions/gitversion/execute@v3
       with:
-        tag: 'Alpha'
         useConfigFile: true
         updateAssemblyInfo: true
         updateAssemblyInfoFormat: 'FullSemVer'
+        overrideConfig: |
+          tag: 'Alpha'
 
     - name: Show GitVersion
       run: echo "FullSemVer:${{ steps.gitversion.outputs.fullSemVer }}"
