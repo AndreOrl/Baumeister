@@ -31,6 +31,9 @@ jobs:
     - name: Run GitVersion
       id: gitversion
       uses: gittools/actions/gitversion/execute@v3
+      with:
+        useConfigFile: true
+        configFilePath: ./GitVersion.yml
 
     - name: Show GitVersion
       run: echo "FullSemVer:${{ steps.gitversion.outputs.fullSemVer }}"

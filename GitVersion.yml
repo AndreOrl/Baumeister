@@ -1,6 +1,5 @@
 mode: ContinuousDeployment
 branches:
   main:
-    is-mainline: true  
     label: ''
     increment: Patch
