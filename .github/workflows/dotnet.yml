@@ -35,9 +35,6 @@ jobs:
         useConfigFile: true
         configFilePath: ./GitVersion.yml
 
-    - name: Show GitVersion Configuration
-      run: gitversion /showConfig
-
     - name: Show GitVersion
       run: echo "FullSemVer:${{ steps.gitversion.outputs.fullSemVer }}"
         
