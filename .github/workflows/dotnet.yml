@@ -58,3 +58,6 @@ jobs:
         generate_release_notes: true
         draft: true
         prerelease: true
+
+    - name: Publish to GitHub Packages
+      run: dotnet nuget push "./nupkg/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }}
