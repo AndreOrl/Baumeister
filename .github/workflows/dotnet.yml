@@ -31,6 +31,11 @@ jobs:
     - name: Run GitVersion
       id: gitversion
       uses: gittools/actions/gitversion/execute@v3
+      with:
+        tag: 'Alpha'
+        useConfigFile: true
+        updateAssemblyInfo: true
+        updateAssemblyInfoFormat: 'FullSemVer'
 
     - name: Show GitVersion
       run: echo "FullSemVer:${{ steps.gitversion.outputs.fullSemVer }}"
@@ -38,7 +43,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
       
-    - name: Build with version
+    - name: Build
       run: dotnet build --no-restore -c Release -p:Version=${{ steps.gitversion.outputs.fullSemVer }}
       
     - name: Test
@@ -60,7 +65,7 @@ jobs:
         prerelease: true
 
     - name: Pack
-      run: dotnet pack --configuration Release --output ./nupkg
+      run: dotnet pack --configuration Release --output ./nupkg -p:Version=${{ steps.gitversion.outputs.fullSemVer }} --no-build
 
-    - name: Publish Baumeister.Abstractions to nuget.org
-      run: dotnet nuget push "./nupkg/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source "https://api.nuget.org/v3/index.json"
+    #- name: Publish Baumeister.Abstractions to nuget.org
+    #  run: dotnet nuget push "./nupkg/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source "https://api.nuget.org/v3/index.json"
