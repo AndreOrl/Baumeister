@@ -42,31 +42,28 @@ jobs:
       run: dotnet restore
       
     - name: Build
-      run: dotnet build --no-restore -c Release
-
-    # - name: Build
-    #   run: dotnet build --no-restore -c Release -p:Version=${{ steps.gitversion.outputs.fullSemVer }}
+      run: dotnet build --no-restore -c Release /p:IsPackable=false
       
     - name: Test
       run: dotnet test --no-build -c Release --verbosity normal
 
-    # - name: Create Git Tag
-    #   run: |
-    #     git config user.name "GitHub Actions"
-    #     git config user.email "actions@github.com"
-    #     git tag -a v${{ steps.gitversion.outputs.fullSemVer }} -m "Release v${{ steps.gitversion.outputs.fullSemVer }}"
-    #     git push origin v${{ steps.gitversion.outputs.fullSemVer }}
+    - name: Create Git Tag
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git tag -a v${{ steps.gitversion.outputs.fullSemVer }} -m "Release v${{ steps.gitversion.outputs.fullSemVer }}"
+        git push origin v${{ steps.gitversion.outputs.fullSemVer }}
 
-    # - name: Create release 
-    #   uses: softprops/action-gh-release@v2
-    #   with:
-    #     name: "Release ${{ steps.gitversion.outputs.fullSemVer }}"
-    #     generate_release_notes: true
-    #     draft: true
-    #     prerelease: true
+    - name: Create release 
+      uses: softprops/action-gh-release@v2
+      with:
+        name: "Release ${{ steps.gitversion.outputs.fullSemVer }}"
+        generate_release_notes: true
+        draft: true
+        prerelease: true
 
-    # - name: Pack
-    #   run: dotnet pack --configuration Release --output ./nupkg --no-build
+    - name: Pack
+      run: dotnet pack --configuration Release --output ./nupkg --no-build
 
     # - name: Publish packages to nuget.org
     #   run: dotnet nuget push "./nupkg/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source "https://api.nuget.org/v3/index.json"
