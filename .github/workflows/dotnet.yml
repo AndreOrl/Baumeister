@@ -11,7 +11,9 @@ on:
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -32,9 +34,6 @@ jobs:
       with:
         useConfigFile: true
         configFilePath: ./GitVersion.yml
-
-    - name: Show GitVersion
-      run: echo "FullSemVer:${{ steps.gitversion.outputs.fullSemVer }}"
         
     - name: Restore dependencies
       run: dotnet restore
@@ -45,20 +44,8 @@ jobs:
     - name: Test
       run: dotnet test --no-build -c Release --verbosity normal
 
-  publish:
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Restore dependencies
-      run: dotnet restore
-
     - name: Create Git Tag
+      if: github.ref == 'refs/heads/master'
       run: |
         git config user.name "GitHub Actions"
         git config user.email "actions@github.com"
@@ -66,6 +53,7 @@ jobs:
         git push origin v${{ steps.gitversion.outputs.fullSemVer }}
 
     - name: Create release 
+      if: github.ref == 'refs/heads/master'
       uses: softprops/action-gh-release@v2
       with:
         name: "Release ${{ steps.gitversion.outputs.fullSemVer }}"
@@ -74,7 +62,9 @@ jobs:
         prerelease: true
 
     - name: Pack
+      if: github.ref == 'refs/heads/master'
       run: dotnet pack --configuration Release --output ./nupkg --no-build
 
     - name: Publish packages to nuget.org
+      if: github.ref == 'refs/heads/master'
       run: dotnet nuget push "./nupkg/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source "https://api.nuget.org/v3/index.json"
