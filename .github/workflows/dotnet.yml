@@ -55,6 +55,9 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Restore dependencies
+      run: dotnet restore
+
     - name: Create Git Tag
       run: |
         git config user.name "GitHub Actions"
