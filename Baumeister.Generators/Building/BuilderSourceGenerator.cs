@@ -39,64 +39,94 @@ namespace Baumeister.Generators.Building
 
         private void Execute(Compilation compilation, ImmutableArray<ClassDeclarationSyntax> classes, SourceProductionContext context)
         {
-            foreach (var candidate in classes)
+            foreach (ClassDeclarationSyntax candidate in classes)
             {
                 var className = candidate.Identifier.ValueText;
-                var namespaceDeclaration = candidate.Ancestors().OfType<NamespaceDeclarationSyntax>().First();
-                var namespaceName = namespaceDeclaration.Name.ToString();
-
-                var sourceBuilder = new StringBuilder();
-                sourceBuilder.AppendLine("#nullable enable");
-                sourceBuilder.AppendLine("using System;");
-                sourceBuilder.AppendLine("");
-                sourceBuilder.AppendLine($"namespace {namespaceName}");
-                sourceBuilder.AppendLine("{");
-                sourceBuilder.AppendLine($"    public partial class {className}");
-                sourceBuilder.AppendLine("    {");
-
+                
+                StringBuilder sourceBuilder = GenerateNewClassesCodeFor(candidate);
+                AddCodeForInitializationOfDefaultValues(className, sourceBuilder);
                 AddNewMethod(className, sourceBuilder);
-
-                var semanticModel = compilation.GetSemanticModel(candidate.SyntaxTree);
-                var baseType = candidate.BaseList?.Types
-                    .Select(baseType => semanticModel.GetTypeInfo(baseType.Type).Type)
-                    .OfType<INamedTypeSymbol>()
-                    .FirstOrDefault(type => type.Name == "BuilderBase");
-
-                if (baseType != null && baseType.TypeArguments.Length == 1)
-                {
-                    if (baseType.TypeArguments[0] is INamedTypeSymbol typeToBuild)
-                    {
-                        foreach (var property in typeToBuild.GetMembers().OfType<IPropertySymbol>())
-                        {
-                            AddWithMethodFor(property.Type, property.Name, className, sourceBuilder);
-                        }
-                    }
-                }
-
-                sourceBuilder.AppendLine("    }");
-                sourceBuilder.AppendLine("}");
-                sourceBuilder.AppendLine("#nullable restore");
+                AddWithMethods(candidate, compilation, sourceBuilder);
+                AppendClassFooter(sourceBuilder);
 
                 context.AddSource($"{className}Extensions.g.cs", SourceText.From(sourceBuilder.ToString(), Encoding.UTF8));
             }
         }
-
-        private void AddNewMethod(string builderTypeName, StringBuilder stringBuilder)
+               
+        private StringBuilder GenerateNewClassesCodeFor(ClassDeclarationSyntax candidate)
         {
-            stringBuilder.AppendLine($"        public static {builderTypeName} New()");
-            stringBuilder.AppendLine("        {");
-            stringBuilder.AppendLine($"            return new {builderTypeName}();");
-            stringBuilder.AppendLine("        }");
+            var className = candidate.Identifier.ValueText;
+            var namespaceDeclaration = candidate.Ancestors().OfType<NamespaceDeclarationSyntax>().First();
+            var namespaceName = namespaceDeclaration.Name.ToString();
+
+            var sourceBuilder = new StringBuilder();
+            sourceBuilder.AppendLine("#nullable enable");
+            sourceBuilder.AppendLine("using System;");
+            sourceBuilder.AppendLine("");
+            sourceBuilder.AppendLine($"namespace {namespaceName}");
+            sourceBuilder.AppendLine("{");
+            sourceBuilder.AppendLine($"    public partial class {className}");
+            sourceBuilder.AppendLine("    {");
+
+            return sourceBuilder;
         }
 
-        private void AddWithMethodFor(ITypeSymbol propertyType, string propertyName, string builderTypeName, StringBuilder stringBuilder)
+        private void AddCodeForInitializationOfDefaultValues(string className, StringBuilder sourceBuilder)
         {
-            stringBuilder.AppendLine("");
-            stringBuilder.AppendLine($"        public {builderTypeName} With{propertyName}({propertyType} {propertyName.ToLower()})");
-            stringBuilder.AppendLine("        {");
-            stringBuilder.AppendLine($"            this.With(\"{propertyName}\", {propertyName.ToLower()});");
-            stringBuilder.AppendLine("            return this;");
-            stringBuilder.AppendLine("        }");
+            sourceBuilder.AppendLine();
+            sourceBuilder.AppendLine($"        public {className}()");
+            sourceBuilder.AppendLine("        {");
+            sourceBuilder.AppendLine("            OnInitializeDefaults();");
+            sourceBuilder.AppendLine("        }");
+            sourceBuilder.AppendLine();
+            sourceBuilder.AppendLine("        partial void OnInitializeDefaults();");
+        }
+
+        private void AddNewMethod(string builderTypeName, StringBuilder sourceBuilder)
+        {
+            sourceBuilder.AppendLine();
+            sourceBuilder.AppendLine($"        public static {builderTypeName} New()");
+            sourceBuilder.AppendLine("        {");
+            sourceBuilder.AppendLine($"            return new {builderTypeName}();");
+            sourceBuilder.AppendLine("        }");
+        }
+
+        private void AddWithMethods(ClassDeclarationSyntax candidate, Compilation compilation, StringBuilder sourceBuilder)
+        {
+            var className = candidate.Identifier.ValueText;
+            var semanticModel = compilation.GetSemanticModel(candidate.SyntaxTree);
+            var baseType = candidate.BaseList?.Types
+                .Select(baseType => semanticModel.GetTypeInfo(baseType.Type).Type)
+                .OfType<INamedTypeSymbol>()
+                .FirstOrDefault(type => type.Name == "BuilderBase");
+
+            if (baseType != null && baseType.TypeArguments.Length == 1)
+            {
+                if (baseType.TypeArguments[0] is INamedTypeSymbol typeToBuild)
+                {
+                    foreach (var property in typeToBuild.GetMembers().OfType<IPropertySymbol>())
+                    {
+                        AddWithMethodFor(property.Type, property.Name, className, sourceBuilder);
+                    }
+                }
+            }
+        }
+
+        private void AddWithMethodFor(ITypeSymbol propertyType, string propertyName, string builderTypeName, StringBuilder sourceBuilder)
+        {
+            sourceBuilder.AppendLine();
+            sourceBuilder.AppendLine($"        public {builderTypeName} With{propertyName}({propertyType.Name} {propertyName.ToLower()})");
+            sourceBuilder.AppendLine("        {");
+            sourceBuilder.AppendLine($"            this.With(\"{propertyName}\", {propertyName.ToLower()});");
+            sourceBuilder.AppendLine("            return this;");
+            sourceBuilder.AppendLine("        }");
+        }
+
+        private void AppendClassFooter(StringBuilder sourceBuilder)
+        {
+            sourceBuilder.AppendLine("    }");
+            sourceBuilder.AppendLine("}");
+            sourceBuilder.AppendLine("#nullable restore");
         }
     }
 }

@@ -53,6 +53,26 @@ class Program
 	}
 }
 ```
+
+## Setting Default Values in Builders
+
+You can set type-safe default values for your generated builders without modifying your target classes.
+
+Simply implement the partial method `OnInitializeDefaults` in your partial builder:
+
+```csharp
+public partial class HouseBuilder : BuilderBase<House>
+{
+    partial void OnInitializeDefaults()
+    {
+        WithFloors(1);
+        WithHasGarden(false);
+    }
+}
+```
+
+These defaults are used unless you override them with a `WithXyz` call before calling `Build()`.
+
 ## How it works
 Baumeister uses the Roslyn compiler to analyze the source code of the project.
 It searches for classes that are specializations of `BuilderBase` and generates a partial class with methods that enables the builder pattern.

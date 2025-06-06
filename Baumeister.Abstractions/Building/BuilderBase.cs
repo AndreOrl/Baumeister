@@ -11,6 +11,12 @@ namespace Baumeister.Abstractions.Building
         {
             if(value != null)
             {
+                var existingValueEntry = valueStore.FirstOrDefault(p => p.Name == name);
+                if (existingValueEntry != null)
+                {
+                    valueStore.Remove(existingValueEntry);
+                }
+
                 valueStore.Add(new ValueMapping(name, value));
             }
 
