@@ -1,5 +1,9 @@
 <Project>
     <PropertyGroup>
       <Nullable>enable</Nullable>
+      <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+      <AnalysisLevel>latest-recommended</AnalysisLevel>
+      <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
+      <NoWarn>CA1707</NoWarn><!-- Disable CA1707: Identifiers should not contain underscores -->
     </PropertyGroup>
 </Project>

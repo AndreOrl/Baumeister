@@ -46,7 +46,7 @@ namespace Baumeister.Abstractions.Building
             return isCtorFound ? foundConstructor! : throw new InvalidOperationException("No constructor found");
         }      
 
-        private bool TryFindExactMatchingConstructor(ConstructorInfo[] constructors, Type[] valueTypes, ref ConstructorInfo? foundConstructor)
+        private static bool TryFindExactMatchingConstructor(ConstructorInfo[] constructors, Type[] valueTypes, ref ConstructorInfo? foundConstructor)
         {
             foreach (var constructor in constructors)
             {
@@ -62,7 +62,7 @@ namespace Baumeister.Abstractions.Building
             return false;
         }
 
-        private bool TryFindImplicitMatchingConstructor(ConstructorInfo[] constructors, Type[] valueTypes, ref ConstructorInfo? foundConstructor)
+        private static bool TryFindImplicitMatchingConstructor(ConstructorInfo[] constructors, Type[] valueTypes, ref ConstructorInfo? foundConstructor)
         {
             ConstructorInfo? bestMatch = null;
             int maxMatches = -1;
@@ -88,7 +88,7 @@ namespace Baumeister.Abstractions.Building
             return false;
         }
 
-        private TEntity InvokeConstructor(ConstructorInfo constructor, List<ValueMapping> values, out List<ValueMapping> remainingValues)
+        private static TEntity InvokeConstructor(ConstructorInfo constructor, List<ValueMapping> values, out List<ValueMapping> remainingValues)
         {
             remainingValues = new List<ValueMapping>();
             remainingValues.AddRange(values);
@@ -124,12 +124,12 @@ namespace Baumeister.Abstractions.Building
             return (TEntity)constructor.Invoke(orderedValues);
         }
 
-        private object? GetDefaultValue(Type type)
+        private static object? GetDefaultValue(Type type)
         {
             return type.IsValueType ? Activator.CreateInstance(type) : null;
         }
 
-        private void SetRemainingProperties(ConstructorInfo usedConstructor, TEntity createdObject, List<ValueMapping> values)
+        private static void SetRemainingProperties(ConstructorInfo usedConstructor, TEntity createdObject, List<ValueMapping> values)
         {
             var initializedConstructorParameters = usedConstructor.GetParameters().Select(p => p.Name.ToLowerInvariant());
 
