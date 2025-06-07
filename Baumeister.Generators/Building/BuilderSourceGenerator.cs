@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -37,7 +38,7 @@ namespace Baumeister.Generators.Building
             return classDeclaration;
         }
 
-        private void Execute(Compilation compilation, ImmutableArray<ClassDeclarationSyntax> classes, SourceProductionContext context)
+        private static void Execute(Compilation compilation, ImmutableArray<ClassDeclarationSyntax> classes, SourceProductionContext context)
         {
             foreach (ClassDeclarationSyntax candidate in classes)
             {
@@ -53,7 +54,7 @@ namespace Baumeister.Generators.Building
             }
         }
                
-        private StringBuilder GenerateNewClassesCodeFor(ClassDeclarationSyntax candidate)
+        private static StringBuilder GenerateNewClassesCodeFor(ClassDeclarationSyntax candidate)
         {
             var className = candidate.Identifier.ValueText;
             var namespaceDeclaration = candidate.Ancestors().OfType<NamespaceDeclarationSyntax>().First();
@@ -71,7 +72,7 @@ namespace Baumeister.Generators.Building
             return sourceBuilder;
         }
 
-        private void AddCodeForInitializationOfDefaultValues(string className, StringBuilder sourceBuilder)
+        private static void AddCodeForInitializationOfDefaultValues(string className, StringBuilder sourceBuilder)
         {
             sourceBuilder.AppendLine();
             sourceBuilder.AppendLine($"        public {className}()");
@@ -82,7 +83,7 @@ namespace Baumeister.Generators.Building
             sourceBuilder.AppendLine("        partial void OnInitializeDefaults();");
         }
 
-        private void AddNewMethod(string builderTypeName, StringBuilder sourceBuilder)
+        private static void AddNewMethod(string builderTypeName, StringBuilder sourceBuilder)
         {
             sourceBuilder.AppendLine();
             sourceBuilder.AppendLine($"        public static {builderTypeName} New()");
@@ -91,7 +92,7 @@ namespace Baumeister.Generators.Building
             sourceBuilder.AppendLine("        }");
         }
 
-        private void AddWithMethods(ClassDeclarationSyntax candidate, Compilation compilation, StringBuilder sourceBuilder)
+        private static void AddWithMethods(ClassDeclarationSyntax candidate, Compilation compilation, StringBuilder sourceBuilder)
         {
             var className = candidate.Identifier.ValueText;
             var semanticModel = compilation.GetSemanticModel(candidate.SyntaxTree);
@@ -112,17 +113,17 @@ namespace Baumeister.Generators.Building
             }
         }
 
-        private void AddWithMethodFor(ITypeSymbol propertyType, string propertyName, string builderTypeName, StringBuilder sourceBuilder)
+        private static void AddWithMethodFor(ITypeSymbol propertyType, string propertyName, string builderTypeName, StringBuilder sourceBuilder)
         {
             sourceBuilder.AppendLine();
-            sourceBuilder.AppendLine($"        public {builderTypeName} With{propertyName}({propertyType.Name} {propertyName.ToLower()})");
+            sourceBuilder.AppendLine($"        public {builderTypeName} With{propertyName}({propertyType.Name} {propertyName.ToLower(CultureInfo.InvariantCulture)})");
             sourceBuilder.AppendLine("        {");
-            sourceBuilder.AppendLine($"            this.With(\"{propertyName}\", {propertyName.ToLower()});");
+            sourceBuilder.AppendLine($"            this.With(\"{propertyName}\", {propertyName.ToLower(CultureInfo.InvariantCulture)});");
             sourceBuilder.AppendLine("            return this;");
             sourceBuilder.AppendLine("        }");
         }
 
-        private void AppendClassFooter(StringBuilder sourceBuilder)
+        private static void AppendClassFooter(StringBuilder sourceBuilder)
         {
             sourceBuilder.AppendLine("    }");
             sourceBuilder.AppendLine("}");

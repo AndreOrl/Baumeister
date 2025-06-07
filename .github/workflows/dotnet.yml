@@ -39,7 +39,7 @@ jobs:
       run: dotnet restore
       
     - name: Build
-      run: dotnet build --no-restore -c Release /p:IsPackable=false
+      run: dotnet build --no-restore --nologo --warnaserror -c Release /p:IsPackable=false
       
     - name: Test
       run: dotnet test --no-build -c Release --verbosity normal
