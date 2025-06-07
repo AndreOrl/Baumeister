@@ -48,7 +48,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: coverage-report
-        path: **/coverage.cobertura.xml
+        path: '**/coverage.cobertura.xml'
 
     - name: Create Git Tag
       if: github.ref == 'refs/heads/main'
