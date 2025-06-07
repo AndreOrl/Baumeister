@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using System;
 using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
@@ -95,6 +96,18 @@ namespace Baumeister.Generators.Building
         private static void AddWithMethods(ClassDeclarationSyntax candidate, Compilation compilation, StringBuilder sourceBuilder)
         {
             var className = candidate.Identifier.ValueText;
+            var namedTypeSymbolToBuild = GetNamedTypeSymbolToCreateBuilderFor(candidate, compilation);
+            if (namedTypeSymbolToBuild != null) 
+            {
+                foreach (var propertySymbol in namedTypeSymbolToBuild.GetMembers().OfType<IPropertySymbol>())
+                {
+                    AddWithMethodFor(className, propertySymbol, sourceBuilder);
+                }
+            }
+        }
+
+        private static INamedTypeSymbol? GetNamedTypeSymbolToCreateBuilderFor(ClassDeclarationSyntax candidate, Compilation compilation)
+        {
             var semanticModel = compilation.GetSemanticModel(candidate.SyntaxTree);
             var baseType = candidate.BaseList?.Types
                 .Select(baseType => semanticModel.GetTypeInfo(baseType.Type).Type)
@@ -105,20 +118,19 @@ namespace Baumeister.Generators.Building
             {
                 if (baseType.TypeArguments[0] is INamedTypeSymbol typeToBuild)
                 {
-                    foreach (var property in typeToBuild.GetMembers().OfType<IPropertySymbol>())
-                    {
-                        AddWithMethodFor(property.Type, property.Name, className, sourceBuilder);
-                    }
+                    return typeToBuild;
                 }
             }
+
+            return null;
         }
 
-        private static void AddWithMethodFor(ITypeSymbol propertyType, string propertyName, string builderTypeName, StringBuilder sourceBuilder)
+        private static void AddWithMethodFor(string builderTypeName, IPropertySymbol propertySymbol, StringBuilder sourceBuilder)
         {
             sourceBuilder.AppendLine();
-            sourceBuilder.AppendLine($"        public {builderTypeName} With{propertyName}({propertyType.Name} {propertyName.ToLower(CultureInfo.InvariantCulture)})");
+            sourceBuilder.AppendLine($"        public {builderTypeName} With{propertySymbol.Name}({propertySymbol.Type} {propertySymbol.Name.ToLower(CultureInfo.InvariantCulture)})");
             sourceBuilder.AppendLine("        {");
-            sourceBuilder.AppendLine($"            this.With(\"{propertyName}\", {propertyName.ToLower(CultureInfo.InvariantCulture)});");
+            sourceBuilder.AppendLine($"            this.With(\"{propertySymbol.Name}\", {propertySymbol.Name.ToLower(CultureInfo.InvariantCulture)});");
             sourceBuilder.AppendLine("            return this;");
             sourceBuilder.AppendLine("        }");
         }
