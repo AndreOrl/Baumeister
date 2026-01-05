@@ -101,9 +101,17 @@ namespace Baumeister.Generators.Building
             {
                 foreach (var propertySymbol in namedTypeSymbolToBuild.GetMembers().OfType<IPropertySymbol>())
                 {
-                    AddWithMethodFor(className, propertySymbol, sourceBuilder);
+                    if(IsPropertySymbolValidForBuilder(propertySymbol))
+                    {
+                        AddWithMethodFor(className, propertySymbol, sourceBuilder);
+                    }
                 }
             }
+        }
+
+        private static bool IsPropertySymbolValidForBuilder(IPropertySymbol propertySymbol)
+        {
+            return propertySymbol.Name != "EqualityContract";
         }
 
         private static INamedTypeSymbol? GetNamedTypeSymbolToCreateBuilderFor(ClassDeclarationSyntax candidate, Compilation compilation)
