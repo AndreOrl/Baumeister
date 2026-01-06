@@ -36,23 +36,23 @@ namespace Baumeister.Abstractions.Building
         private ConstructorInfo FindMatchingConstructor()
         {
             ConstructorInfo[] constructors = typeof(TEntity).GetConstructors();
-            Type[] valueTypes = valueStore.Select(v => v.Value.GetType()).ToArray();
+            Type[] valueStoreTypes = valueStore.Select(v => v.Value.GetType()).ToArray();
 
 
             ConstructorInfo? foundConstructor = null;
-            var isCtorFound = TryFindExactMatchingConstructor(constructors, valueTypes, ref foundConstructor);
-            isCtorFound = isCtorFound || TryFindImplicitMatchingConstructor(constructors, valueTypes, ref foundConstructor);
+            var isCtorFound = TryFindExactMatchingConstructor(constructors, valueStoreTypes, ref foundConstructor);
+            isCtorFound = isCtorFound || TryFindImplicitMatchingConstructor(constructors, valueStoreTypes, ref foundConstructor);
 
             return isCtorFound ? foundConstructor! : throw new InvalidOperationException("No constructor found");
         }      
 
-        private static bool TryFindExactMatchingConstructor(ConstructorInfo[] constructors, Type[] valueTypes, ref ConstructorInfo? foundConstructor)
+        private static bool TryFindExactMatchingConstructor(ConstructorInfo[] constructors, Type[] valueStoreTypes, ref ConstructorInfo? foundConstructor)
         {
             foreach (var constructor in constructors)
             {
                 var parameters = constructor.GetParameters();
-                if (parameters.Length == valueTypes.Length &&
-                    parameters.All(p => valueTypes.Contains(p.ParameterType)))
+                if (parameters.Length == valueStoreTypes.Length &&
+                    parameters.All(p => valueStoreTypes.Contains(p.ParameterType)))
                 {
                     foundConstructor = constructor;
                     return true;
