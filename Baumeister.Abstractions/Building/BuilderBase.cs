@@ -108,7 +108,7 @@ namespace Baumeister.Abstractions.Building
                 }
                 else if(valuesMatchedByType.Count > 1)
                 {
-                    var valuesMatchedByTypeAndName = valuesMatchedByType.Where(v => parameters[i].Name == v.Name).ToList();
+                    var valuesMatchedByTypeAndName = valuesMatchedByType.Where(v => parameters[i].Name.Equals(v.Name, StringComparison.OrdinalIgnoreCase)).ToList();
                     if (valuesMatchedByTypeAndName.Count == 1)
                     {
                         orderedValues[i] = valuesMatchedByTypeAndName[0].Value;

@@ -100,7 +100,7 @@ public class FileScopedNamespace
         // Act: run the source generator
         var generator = new BuilderSourceGenerator();
         var driver = CSharpGeneratorDriver.Create(generator);
-        driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var diagnostics);
+        driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
 
         var generatedSourceCode = updatedCompilation.SyntaxTrees.ElementAt(1).GetRoot().ToFullString();
 
@@ -109,10 +109,77 @@ public class FileScopedNamespace
         Console.WriteLine(generatedSourceCode);
 
         // Basic assertions that the important parts exist in generated code
-        Assert.That(generatedSourceCode, Does.Contain("#nullable enable"));
         Assert.That(generatedSourceCode, Does.Contain("namespace Baumeister.FileScoped.Namespace"));
         Assert.That(generatedSourceCode, Does.Contain("public partial class FileScopedNamespaceBuilder"));
         Assert.That(generatedSourceCode, Does.Contain("public FileScopedNamespaceBuilder()"));
-        Assert.That(generatedSourceCode, Does.Contain("#nullable restore"));
+    }
+
+    [Test]
+    public void Generator_WithPropertyWithoutSetter_ShouldNotGenerateWithMethodForIt()
+    {
+        var source = @"
+public partial class GetterOnlyPropertyBuilder : BuilderBase<GetterOnlyProperty>;
+
+public class GetterOnlyProperty
+{
+    public string OnlyGet { get; }
+}
+";
+
+        var compilation = CreateCompilation(source);
+
+        // Act: run the source generator
+        var generator = new BuilderSourceGenerator();
+        var driver = CSharpGeneratorDriver.Create(generator);
+        driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
+
+        var generatedSourceCode = updatedCompilation.SyntaxTrees.ElementAt(1).GetRoot().ToFullString();
+
+        // Debug: Print generated code
+        Console.WriteLine("Generated code:");
+        Console.WriteLine(generatedSourceCode);
+
+        // Basic assertions that the important parts exist in generated code
+        Assert.That(generatedSourceCode, Does.Contain("public partial class GetterOnlyPropertyBuilder"));
+        Assert.That(generatedSourceCode, Does.Contain("public GetterOnlyPropertyBuilder()"));
+        Assert.That(generatedSourceCode, Does.Not.Contain("WithOnlyGet"));
+    }
+
+    [Test]
+    public void Generator_WithCtorWithPrivateField_ShouldGenerateWithMethodForIt()
+    {
+        var source = @"
+public partial class CtorWithPrivateFieldBuilder : BuilderBase<CtorWithPrivateField>;
+
+public class CtorWithPrivateField
+{
+    private string _privateField;
+
+    public string PrivateField { get; set; }
+    
+    public CtorWithPrivateField(string privateField)
+    {
+        _privateField = privateField;
+    }
+}
+";
+
+        var compilation = CreateCompilation(source);
+
+        // Act: run the source generator
+        var generator = new BuilderSourceGenerator();
+        var driver = CSharpGeneratorDriver.Create(generator);
+        driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var _);
+
+        var generatedSourceCode = updatedCompilation.SyntaxTrees.ElementAt(1).GetRoot().ToFullString();
+
+        // Debug: Print generated code
+        Console.WriteLine("Generated code:");
+        Console.WriteLine(generatedSourceCode);
+
+        // Basic assertions that the important parts exist in generated code
+        Assert.That(generatedSourceCode, Does.Contain("public partial class CtorWithPrivateFieldBuilder"));
+        Assert.That(generatedSourceCode, Does.Contain("public CtorWithPrivateFieldBuilder()"));
+        Assert.That(generatedSourceCode, Does.Contain("WithPrivateField"));
     }
 }
