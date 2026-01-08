@@ -1,6 +1,8 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
@@ -121,12 +123,35 @@ namespace Baumeister.Generators.Building
             var namedTypeSymbolToBuild = GetNamedTypeSymbolToCreateBuilderFor(candidate, compilation);
             if (namedTypeSymbolToBuild != null) 
             {
-                foreach (var propertySymbol in namedTypeSymbolToBuild.GetMembers().OfType<IPropertySymbol>())
+                var propertyWithMethodInfos = GetWithMethodInfosForProperties(namedTypeSymbolToBuild);
+                var ctorWithMethodInfos = GetWithMethodInfosForCtors(namedTypeSymbolToBuild);
+                var allWithMethodInfos = propertyWithMethodInfos.Concat(ctorWithMethodInfos).Distinct();
+
+                foreach (var withMethodInfo in allWithMethodInfos)
                 {
-                    if(IsPropertySymbolValidForBuilder(propertySymbol))
-                    {
-                        AddWithMethodFor(className, propertySymbol, sourceBuilder);
-                    }
+                    AddWithMethodFor(className, withMethodInfo.ParameterName, withMethodInfo.ParameterTypeName, sourceBuilder);
+                }
+            }
+        }
+
+        private static IEnumerable<WithMethodInfo> GetWithMethodInfosForProperties(INamedTypeSymbol namedTypeSymbolToBuild)
+        {
+            foreach (var propertySymbol in namedTypeSymbolToBuild.GetMembers().OfType<IPropertySymbol>())
+            {
+                if (IsPropertySymbolValidForBuilder(propertySymbol))
+                {
+                    yield return CreateWithMethodInfoFor(propertySymbol);
+                }
+            }
+        }
+
+        private static IEnumerable<WithMethodInfo> GetWithMethodInfosForCtors(INamedTypeSymbol namedTypeSymbolToBuild)
+        {
+            foreach (var constructor in namedTypeSymbolToBuild.InstanceConstructors)
+            {
+                foreach (var parameterSymbol in constructor.Parameters)
+                {
+                    yield return CreateWithMethodInfoFor(parameterSymbol);
                 }
             }
         }
@@ -135,7 +160,8 @@ namespace Baumeister.Generators.Building
         {
             return 
                 propertySymbol.Name != "EqualityContract" && 
-                propertySymbol.IsStatic == false;
+                propertySymbol.IsStatic == false &&
+                propertySymbol.SetMethod != null;
         }
 
         private static INamedTypeSymbol? GetNamedTypeSymbolToCreateBuilderFor(ClassDeclarationSyntax candidate, Compilation compilation)
@@ -157,12 +183,16 @@ namespace Baumeister.Generators.Building
             return null;
         }
 
-        private static void AddWithMethodFor(string builderTypeName, IPropertySymbol propertySymbol, StringBuilder sourceBuilder)
+        private static WithMethodInfo CreateWithMethodInfoFor(IParameterSymbol parameterSymbol) => new(parameterSymbol.Type.ToString(), parameterSymbol.Name);
+
+        private static WithMethodInfo CreateWithMethodInfoFor(IPropertySymbol propertySymbol) => new(propertySymbol.Type.ToString(), propertySymbol.Name);
+
+        private static void AddWithMethodFor(string builderTypeName, string name, string typeName, StringBuilder sourceBuilder)
         {
-            sourceBuilder.AppendLine();
-            sourceBuilder.AppendLine($"        public {builderTypeName} With{propertySymbol.Name}({propertySymbol.Type} {propertySymbol.Name.ToLower(CultureInfo.InvariantCulture)})");
+                        sourceBuilder.AppendLine();
+            sourceBuilder.AppendLine($"        public {builderTypeName} With{name.FirstCharToUpper()}({typeName} {name.ToLower(CultureInfo.InvariantCulture)})");
             sourceBuilder.AppendLine("        {");
-            sourceBuilder.AppendLine($"            this.With(\"{propertySymbol.Name}\", {propertySymbol.Name.ToLower(CultureInfo.InvariantCulture)});");
+            sourceBuilder.AppendLine($"            this.With(\"{name.FirstCharToUpper()}\", {name.ToLower(CultureInfo.InvariantCulture)});");
             sourceBuilder.AppendLine("            return this;");
             sourceBuilder.AppendLine("        }");
         }
