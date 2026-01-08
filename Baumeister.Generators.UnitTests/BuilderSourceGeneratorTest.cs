@@ -8,6 +8,26 @@ namespace Baumeister.Generators.UnitTests;
 
 public class BuilderSourceGeneratorTest
 {
+    private static CSharpCompilation CreateCompilation(string source)
+    {
+        var parseOptions = new CSharpParseOptions(languageVersion: LanguageVersion.CSharp12);
+        var syntaxTree = CSharpSyntaxTree.ParseText(SourceText.From(source, System.Text.Encoding.UTF8), parseOptions);
+
+        var references = new[]
+        {
+            MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(System.Console).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(Baumeister.Abstractions.Building.BuilderBase<>).Assembly.Location)
+        };
+
+        return CSharpCompilation.Create(
+            assemblyName: "TestAssembly",
+            syntaxTrees: [syntaxTree],
+            references: references,
+            options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+    }
+
     [Test]
     public void Generator_ShouldGenerateOnlyForCorrectProperties()
     {
@@ -59,25 +79,40 @@ namespace Baumeister.Building
         Assert.That(generatedSourceCode, Does.Not.Contain("WithEqualityContract"));
         Assert.That(generatedSourceCode, Does.Not.Contain("StaticProperty"));
         Assert.That(generatedSourceCode, Does.Not.Contain("notSettable"));
+        Assert.That(generatedSourceCode, Does.Contain("#nullable restore"));
     }
 
-    private static CSharpCompilation CreateCompilation(string source)
+    [Test]
+    public void Generator_WithBuilderInFileScopedNamespace_ShouldUseThatNamespaceForGeneratedPartialClass()
     {
-        var parseOptions = new CSharpParseOptions(languageVersion: LanguageVersion.CSharp12);
-        var syntaxTree = CSharpSyntaxTree.ParseText(SourceText.From(source, System.Text.Encoding.UTF8), parseOptions);
+        var source = @"
+namespace Baumeister.FileScoped.Namespace;
 
-        var references = new[]
-        {
-            MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(System.Console).Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(Baumeister.Abstractions.Building.BuilderBase<>).Assembly.Location)
-        };
+public partial class FileScopedNamespaceBuilder : BuilderBase<FileScopedNamespace>;
 
-        return CSharpCompilation.Create(
-            assemblyName: "TestAssembly",
-            syntaxTrees: [syntaxTree],
-            references: references,
-            options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+public class FileScopedNamespace
+{
+}
+";
+
+        var compilation = CreateCompilation(source);
+
+        // Act: run the source generator
+        var generator = new BuilderSourceGenerator();
+        var driver = CSharpGeneratorDriver.Create(generator);
+        driver.RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out var diagnostics);
+
+        var generatedSourceCode = updatedCompilation.SyntaxTrees.ElementAt(1).GetRoot().ToFullString();
+
+        // Debug: Print generated code
+        Console.WriteLine("Generated code:");
+        Console.WriteLine(generatedSourceCode);
+
+        // Basic assertions that the important parts exist in generated code
+        Assert.That(generatedSourceCode, Does.Contain("#nullable enable"));
+        Assert.That(generatedSourceCode, Does.Contain("namespace Baumeister.FileScoped.Namespace"));
+        Assert.That(generatedSourceCode, Does.Contain("public partial class FileScopedNamespaceBuilder"));
+        Assert.That(generatedSourceCode, Does.Contain("public FileScopedNamespaceBuilder()"));
+        Assert.That(generatedSourceCode, Does.Contain("#nullable restore"));
     }
 }
