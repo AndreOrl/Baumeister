@@ -57,8 +57,7 @@ namespace Baumeister.Generators.Building
         private static StringBuilder GenerateNewClassesCodeFor(ClassDeclarationSyntax candidate)
         {
             var className = candidate.Identifier.ValueText;
-            var namespaceDeclaration = candidate.Ancestors().OfType<NamespaceDeclarationSyntax>().First();
-            var namespaceName = namespaceDeclaration.Name.ToString();
+            var namespaceName = GetNamespace(candidate) ?? "Generated";
 
             var sourceBuilder = new StringBuilder();
             sourceBuilder.AppendLine("#nullable enable");
@@ -70,6 +69,30 @@ namespace Baumeister.Generators.Building
             sourceBuilder.AppendLine("    {");
 
             return sourceBuilder;
+        }
+
+        private static string? GetNamespace(ClassDeclarationSyntax candidate)
+        {
+            // 1. Block-scoped namespace (namespace A { ... })
+            var blockNamespace = candidate
+                .Ancestors()
+                .OfType<BaseNamespaceDeclarationSyntax>()
+                .FirstOrDefault();
+
+            if (blockNamespace != null)
+            {
+                return blockNamespace.Name.ToString();
+            }
+
+            // 2. File-scoped namespace (namespace A.B;)
+            var compilationUnit = candidate.SyntaxTree.GetRoot() as CompilationUnitSyntax;
+
+            var fileNamespace = compilationUnit?
+                .Members
+                .OfType<FileScopedNamespaceDeclarationSyntax>()
+                .FirstOrDefault();
+
+            return fileNamespace?.Name.ToString();
         }
 
         private static void AddCodeForInitializationOfDefaultValues(string className, StringBuilder sourceBuilder)
