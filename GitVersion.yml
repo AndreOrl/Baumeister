@@ -3,7 +3,6 @@ commit-message-incrementing: Enabled
 branches:
   main:
     regex: ^main$
-    is-release-branch: true
     label: Alpha
     increment: Patch
     prevent-increment-of-merged-branch-version: true
@@ -11,5 +10,4 @@ branches:
     regex: ^feature[/-]
     increment: Minor
     source-branches: ['main']
-    is-release-branch: false
     label: Alpha
