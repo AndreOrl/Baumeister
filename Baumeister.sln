@@ -25,6 +25,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub", "GitHub", "{A508EF
 		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Baumeister.Generators.UnitTests", "Baumeister.Generators.UnitTests\Baumeister.Generators.UnitTests.csproj", "{1594E62C-4AC3-41DD-B4E6-B86A22073604}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{D08E4404-6193-4A57-929F-E60F465F2F3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D08E4404-6193-4A57-929F-E60F465F2F3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D08E4404-6193-4A57-929F-E60F465F2F3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1594E62C-4AC3-41DD-B4E6-B86A22073604}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1594E62C-4AC3-41DD-B4E6-B86A22073604}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1594E62C-4AC3-41DD-B4E6-B86A22073604}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1594E62C-4AC3-41DD-B4E6-B86A22073604}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
