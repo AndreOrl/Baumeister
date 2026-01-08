@@ -1,7 +1,13 @@
 mode: ContinuousDelivery
+commit-message-incrementing: Enabled
 branches:
   main:
+    regex: ^main$
     label: Alpha
     increment: Patch
+    prevent-increment-of-merged-branch-version: true
   feature:
+    regex: ^feature[/-]
     increment: Minor
+    source-branches: ['main']
+    label: Alpha
