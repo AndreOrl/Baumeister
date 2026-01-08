@@ -3,3 +3,5 @@ branches:
   main:
     label: Alpha
     increment: Patch
+  feature:
+    increment: Minor
