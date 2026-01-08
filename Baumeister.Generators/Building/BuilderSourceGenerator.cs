@@ -1,7 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
-using System;
 using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
@@ -111,7 +110,9 @@ namespace Baumeister.Generators.Building
 
         private static bool IsPropertySymbolValidForBuilder(IPropertySymbol propertySymbol)
         {
-            return propertySymbol.Name != "EqualityContract";
+            return 
+                propertySymbol.Name != "EqualityContract" && 
+                propertySymbol.IsStatic == false;
         }
 
         private static INamedTypeSymbol? GetNamedTypeSymbolToCreateBuilderFor(ClassDeclarationSyntax candidate, Compilation compilation)
